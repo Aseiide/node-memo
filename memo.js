@@ -1,3 +1,9 @@
+// 標準入力からtitleとbodyを受け取って変数に格納する
+// const title = require("fs").readFileSync("/dev/stdin", "utf8");
+// console.log(title);
+// const body = require("fs").readFileSync("/dev/stdin", "utf8");
+// console.log(body);
+
 // DBに新規にid, title, bodyを保存する処理
 const sqlite3 = require('sqlite3')
 const dbname = 'memo.sqlite3'
@@ -12,6 +18,18 @@ db.serialize(() => {
   db.each('SELECT * FROM memos', (err, row) => {
     if (err) console.log(err.message)
     console.log(`${row.id}: ${row.title}: ${row.body}`)
+  })
+})
+
+// DBに保存されたタイトルを取り出してconsole.logで出力する
+db.serialize(() => {
+  db.all('SELECT title FROM memos', function (err, rows) {
+    if (err) {
+      throw err;
+    }
+    rows.forEach(function (row) {
+      console.log(row.title)
+    })
   })
 })
 
