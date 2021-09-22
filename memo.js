@@ -1,28 +1,18 @@
-// 既存のJSONファイルから取り出す処理
+// DBに新規にid, title, bodyを保存する処理
+const sqlite3 = require('sqlite3')
+const dbname = 'memo.sqlite3'
+const db = new sqlite3.Database(dbname)
 
-const fs = require('fs')
-// const data = JSON.parse(fs.readFileSync('./memos.json', 'utf8'))
-//
-// console.log(data.memos[0])
-// console.log(data.memos[0].title)
-// console.log(data.memos[0].body)
-//
-// data.memos.forEach(value => {
-//   console.log(value.body)
-// })
+db.serialize(() => {
+  db.run('DROP TABLE IF EXISTS memos')
+  db.run('CREATE TABLE IF NOT EXISTS memos(id integer, title text, body, text)')
+  db.run('INSERT INTO memos(id, title, body) values(?, ?, ?)', 1, 'test1', 'バナナ\nトマト\n牛乳\n')
+  db.run('INSERT INTO memos(id, title, body) values(?, ?, ?)', 2, 'test2', 'ティッシュ\n洗剤')
+  db.run('INSERT INTO memos(id, title, body) values(?, ?, ?)', 3, 'test3', 'ヨーグルト')
+  db.each('SELECT * FROM memos', (err, row) => {
+    if (err) console.log(err.message)
+    console.log(`${row.id}: ${row.title}: ${row.body}`)
+  })
+})
 
-// JSONファイルに新規追加する処理
-const jsonObject = JSON.parse(fs.readFileSync('./memos.json', 'utf8'))
-
-const testMemo = {
-  memos: [
-    {
-      id: 4,
-      title: 'test4',
-      body: 'aaa\nbbb\nccc'
-    }
-  ]
-}
-const data = JSON.stringify(testMemo)
-console.log(data)
-fs.writeFileSync('./memos.json', data)
+db.close()
